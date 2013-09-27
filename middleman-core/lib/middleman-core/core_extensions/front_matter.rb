@@ -27,6 +27,7 @@ module Middleman::CoreExtensions
 
     def before_configuration
       ext = self
+      @cache[app] = {}
       app.files.changed { |file| ext.clear_data(file) }
       app.files.deleted { |file| ext.clear_data(file) }
     end
@@ -92,7 +93,7 @@ module Middleman::CoreExtensions
 
     def data(path)
       p = normalize_path(path)
-      @cache[p] ||= begin
+      @cache[app][p] ||= begin
         data, content = frontmatter_and_content(p)
 
         if app.files.exists?("#{path}.frontmatter")
@@ -112,7 +113,7 @@ module Middleman::CoreExtensions
       return unless file.include?(prefix)
       path = file.sub(prefix, "").sub(/\.frontmatter$/, "")
 
-      @cache.delete(path)
+      @cache[app].delete(path)
     end
 
   private
