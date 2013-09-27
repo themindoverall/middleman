@@ -195,7 +195,7 @@ module Middleman
       ext = self
 
       @klass.initialized do
-        ext.app = self
+        ext.app ||= self
       end
 
       @klass.instance_available do
