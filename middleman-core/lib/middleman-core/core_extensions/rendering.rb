@@ -244,12 +244,18 @@ module Middleman
           # Save current buffer for later
           @_out_buf, _buf_was = "", @_out_buf
 
+          puts "Template Body: #{opts[:template_body]}"
+          puts "Source Dir: #{source_dir}"
+          puts "Expanded: #{File.expand_path(path, source_dir)}"
+
           # Read from disk or cache the contents of the file
           body = if opts[:template_body]
             opts.delete(:template_body)
           else
             template_data_for_file(path)
           end
+
+          puts "Body: #{body}"
 
           # Merge per-extension options from config
           extension = File.extname(path)
@@ -271,8 +277,6 @@ module Middleman
             body = newbody if newbody # Allow the callback to return nil to skip it
           end
 
-          puts "Body: #{body}"
-          
           # Read compiled template from disk or cache
           template = cache.fetch(:compiled_template, extension, options, body) do
             puts "Loading #{path} without cache"
