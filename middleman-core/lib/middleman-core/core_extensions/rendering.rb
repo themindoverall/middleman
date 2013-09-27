@@ -1,7 +1,5 @@
 # Shutup Tilt Warnings
 # @private
-require 'digest/md5'
-
 class Tilt::Template
   def warn(*args)
     # Kernel.warn(*args)
@@ -258,8 +256,6 @@ module Middleman
 
           # Overwrite with frontmatter options
           options = options.deep_merge(options[:renderer_options]) if options[:renderer_options]
-          puts '#### : ' + path.to_s
-          options[:cachename] = Digest::MD5.hexdigest(path)
 
           template_class = Tilt[path]
           # Allow hooks to manipulate the template before render
