@@ -86,7 +86,6 @@ module Middleman::CoreExtensions
       # @param [String] path
       # @return [String]
       def template_data_for_file(path)
-        puts ' o m g '
         extensions[:frontmatter].data(path).last
       end
     end

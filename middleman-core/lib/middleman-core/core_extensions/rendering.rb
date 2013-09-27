@@ -308,7 +308,6 @@ module Middleman
         # @param [String] path
         # @return [String]
         def template_data_for_file(path)
-          puts "What the hey???"
           File.read(File.expand_path(path, source_dir))
         end
 
