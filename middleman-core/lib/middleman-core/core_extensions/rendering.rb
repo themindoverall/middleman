@@ -271,8 +271,6 @@ module Middleman
             body = newbody if newbody # Allow the callback to return nil to skip it
           end
 
-          puts "Body: #{body}"
-          
           # Read compiled template from disk or cache
           template = cache.fetch(:compiled_template, extension, options, body) do
             puts "Loading #{path} without cache"
