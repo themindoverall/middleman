@@ -94,6 +94,7 @@ module Middleman::CoreExtensions
     def data(path)
       p = normalize_path(path)
       @cache[app][p] ||= begin
+        puts "missed frontmatter cache for #{p}"
         data, content = frontmatter_and_content(p)
 
         if app.files.exists?("#{path}.frontmatter")
