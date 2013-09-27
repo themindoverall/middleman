@@ -255,7 +255,8 @@ module Middleman
             template_data_for_file(path)
           end
 
-          puts "Body: #{body}"
+          puts loaded_file = File.read(File.expand_path(path, source_dir))
+          puts "Body: #{loaded_file}"
 
           # Merge per-extension options from config
           extension = File.extname(path)
