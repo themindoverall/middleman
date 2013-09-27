@@ -1,6 +1,7 @@
 # Shutup Tilt Warnings
 # @private
 require 'digest/md5'
+require 'yaml'
 
 class Tilt::Template
   def warn(*args)
@@ -260,6 +261,8 @@ module Middleman
           options = options.deep_merge(options[:renderer_options]) if options[:renderer_options]
           puts '#### : ' + path.to_s
           options[:cachename] = "#{Digest::MD5.hexdigest(path)}.cache"
+
+          puts "Options: #{options.to_yaml}"
 
           template_class = Tilt[path]
           # Allow hooks to manipulate the template before render
