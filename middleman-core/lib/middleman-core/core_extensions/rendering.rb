@@ -259,7 +259,7 @@ module Middleman
           # Overwrite with frontmatter options
           options = options.deep_merge(options[:renderer_options]) if options[:renderer_options]
           puts '#### : ' + path.to_s
-          options[:cachename] = Digest::MD5.hexdigest(path)
+          options[:cachename] = "#{Digest::MD5.hexdigest(path)}.cache"
 
           template_class = Tilt[path]
           # Allow hooks to manipulate the template before render
@@ -270,8 +270,12 @@ module Middleman
 
           # Read compiled template from disk or cache
           template = cache.fetch(:compiled_template, extension, options, body) do
+            puts "Loading #{path} without cache"
            ::Tilt.new(path, 1, options) { body }
           end
+
+          puts "Context: #{context.inspect}"
+          puts "Locs: #{locs.inspect}"
 
           # Render using Tilt
           content = template.render(context, locs, &block)
