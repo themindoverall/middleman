@@ -103,8 +103,7 @@ module Middleman
         if first_run
           # Watcher Library
           require "listen"
-          @listener = Listen.to(Dir.pwd, :relative_paths => true, :force_polling => @options[:force_polling])
-          @listener.latency(@options[:latency])
+          @listener = Listen.to(Dir.pwd, :relative_paths => true, :force_polling => @options[:force_polling], :latency => 1.0)
         end
 
         @listener.change do |modified, added, removed|
