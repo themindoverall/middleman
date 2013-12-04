@@ -98,33 +98,43 @@ module Middleman
       def start_file_watcher
         return if @options[:disable_watcher]
 
-        first_run = !@listener
+        @listener.stop if @listener
 
-        if first_run
-          # Watcher Library
-          require "listen"
-          @listener = Listen.to(Dir.pwd, :relative_paths => true, :force_polling => @options[:force_polling], :latency => 1.0)
-        end
+        require "listen"
+        puts "Listening with latency #{@options[:latency]}"
+        base_dir = Pathname(Dir.pwd)
+        @listener = Listen.to(Dir.pwd, relative_paths: true, force_polling: @options[:force_polling], latency: @options[:latency], debug: true) do |modified, added, removed|
+          modified.map!{|dir| Pathname(dir).relative_path_from(base_dir).to_s}
+          added.map!{|dir| Pathname(dir).relative_path_from(base_dir).to_s}
+          removed.map!{|dir| Pathname(dir).relative_path_from(base_dir).to_s}
 
-        @listener.change do |modified, added, removed|
+          puts "modified relative path: #{modified}"
+          puts "added relative path: #{added}"
+          puts "removed relative path: #{removed}"
+
           added_and_modified = (modified + added)
 
           # See if the changed file is config.rb or lib/*.rb
           if needs_to_reload?(added_and_modified + removed)
+            puts 'reloading'
             reload
           else
             added_and_modified.each do |path|
+              puts "add+modify #{path}"
               app.files.did_change(path)
             end
 
             removed.each do |path|
+              puts "remove #{path}"
               app.files.did_delete(path)
             end
           end
         end
+        require 'celluloid'
+        Celluloid.logger.level = Logger::DEBUG
 
         # Don't block this thread
-        @listener.start if first_run
+        @listener.start
       end
 
       # Trap some interupt signals and shut down smoothly

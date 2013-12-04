@@ -7,6 +7,8 @@ require "yaml"
 # Parsing JSON frontmatter
 require "active_support/json"
 
+require 'digest'
+
 # Extensions namespace
 module Middleman::CoreExtensions
 
@@ -92,15 +94,22 @@ module Middleman::CoreExtensions
 
     def data(path)
       p = normalize_path(path)
+
+      digest = Digest::SHA1.file(path)
+      
+      if @cache[path] && @cache[path][1] != digest
+        @cache.delete(path)
+      end
+
       @cache[path] ||= begin
-        data, content = frontmatter_and_content(p)
+        data, digest, content = frontmatter_and_content(p)
 
         if app.files.exists?("#{path}.frontmatter")
           external_data, _ = frontmatter_and_content("#{p}.frontmatter")
           data = external_data.deep_merge(data)
         end
 
-        [data, content]
+        [data, digest, content]
       end
     end
 
@@ -121,6 +130,9 @@ module Middleman::CoreExtensions
     # @return [Array<Hash, String>]
     def parse_yaml_front_matter(content, full_path)
       yaml_regex = /\A(---\s*\n.*?\n?)^(---\s*$\n?)/m
+
+      digest = Digest::SHA1.hexdigest(content)
+
       if content =~ yaml_regex
         content = content.sub(yaml_regex, "")
 
@@ -135,13 +147,15 @@ module Middleman::CoreExtensions
         return false
       end
 
-      [data, content]
+      [data, digest, content]
     rescue
-      [{}, content]
+      [{}, digest, content]
     end
 
     def parse_json_front_matter(content, full_path)
       json_regex = /\A(;;;\s*\n.*?\n?)^(;;;\s*$\n?)/m
+
+      digest = Digest::SHA1.hexdigest(content)
 
       if content =~ json_regex
         content = content.sub(json_regex, "")
@@ -158,14 +172,14 @@ module Middleman::CoreExtensions
         return false
       end
 
-      [data, content]
+      [data, digest, content]
     rescue
-      [{}, content]
+      [{}, digest, content]
     end
 
     # Get the frontmatter and plain content from a file
     # @param [String] path
-    # @return [Array<Thor::CoreExt::HashWithIndifferentAccess, String>]
+    # @return [Array<Thor::CoreExt::HashWithIndifferentAccess, String, String>]
     def frontmatter_and_content(path)
       full_path = if Pathname(path).relative?
         File.join(app.source_dir, path)
@@ -192,7 +206,9 @@ module Middleman::CoreExtensions
         # Probably a binary file, move on
       end
 
-      [data, content]
+      digest = Digest::SHA1.hexdigest(content)
+
+      [data, digest, content]
     end
 
     def normalize_path(path)

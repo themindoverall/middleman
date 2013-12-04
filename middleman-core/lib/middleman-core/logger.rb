@@ -1,4 +1,5 @@
 require 'thread'
+require 'logger'
 
 module Middleman
 

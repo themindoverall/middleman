@@ -32,7 +32,7 @@ Gem::Specification.new do |s|
   s.add_dependency("activesupport", ["~> 4.0.0"])
   
   # Watcher
-  s.add_dependency("listen", ["~> 2.2.0"])
+  s.add_dependency("listen", ["~> 2.3.1"])
 
   # i18n
   s.add_dependency("i18n", ["~> 0.6.1"])
