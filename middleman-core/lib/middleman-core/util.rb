@@ -48,6 +48,9 @@ module Middleman
     # @return [Middleman::Logger] The logger
     def self.logger(*args)
       if !@_logger || args.length > 0
+        if args.length == 1 && (args.first.is_a?(::String) || args.first.respond_to?(:write))
+          args = [0, false, args.first]
+        end
         @_logger = ::Middleman::Logger.new(*args)
       end
 
@@ -136,15 +139,14 @@ module Middleman
     # @param paths Some paths string or Pathname
     # @return [Array] An array of filenames
     def self.all_files_under(*paths)
-      # when we drop 1.8, replace this with flat_map
-      paths.map do |p|
+      paths.flat_map do |p|
         path = Pathname(p)
         if path.directory?
           all_files_under(*path.children)
         elsif path.file?
           path
         end
-      end.flatten.compact
+      end.compact
     end
 
     # Given a source path (referenced either absolutely or relatively)

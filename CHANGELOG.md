@@ -1,10 +1,33 @@
 master
 ===
 
+* Update Padrino to 0.11.4 and Tilt to 1.4.1
+
+3.2.0
+===
+
+* Dropped support for Ruby 1.8
+* Dropped empty "middleman-more" gem
+* Support the AsciiDoc format
+* `page_classes` now prefixes class names starting with numbers with an alpha character. "x" by default.
+* AREL-style sitemap query language no longer mutates on filter
+* Logging can now be forwarded to a file
+* Syntax errors in config.rb no longer hang the server
+* Fixed memory leak when adding blocks to resources. #1020
+* Support HEAD requests in the server
+
+3.1.6
+===
+
 * Magic sitemap-aware links and image references now work when your markdown engine is Kramdown (the default for Middleman).
 * Having the build directory be a symlink no longer causes the --clean (default) option to wipe out your build.
 * Fix handling paths and URLs with spaces in them. #961
 * Loosen up Kramdown dependency to allow for using version 1.2.
+* Loosen up Listen dependency so it works with sass betas.
+* Look for assets using url_for before falling back to the "images" directory. #1017
+* Do not cache generated redirect index file. #1019
+* Make an effort to handle spaces in filenames in a way that url_for can handle. #961
+* Fix localization via filename extension. #1015
 
 3.1.5
 ===

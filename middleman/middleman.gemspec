@@ -16,9 +16,9 @@ Gem::Specification.new do |s|
   s.files         = `git ls-files -z`.split("\0")
   s.test_files    = `git ls-files -z -- {fixtures,features}/*`.split("\0")
   s.require_paths = ["lib"]
+  s.required_ruby_version = '>= 1.9.3'
 
   s.add_dependency("middleman-core", Middleman::VERSION)
-  s.add_dependency("middleman-more", Middleman::VERSION)
   s.add_dependency("middleman-sprockets", ">= 3.1.2")
   s.add_dependency("haml", [">= 3.1.6"])
   s.add_dependency("sass", [">= 3.1.20"])
@@ -26,5 +26,5 @@ Gem::Specification.new do |s|
   s.add_dependency("uglifier", ["~> 2.1.0"])
   s.add_dependency("coffee-script", ["~> 2.2.0"])
   s.add_dependency("execjs", ["~> 1.4.0"])
-  s.add_dependency("kramdown", ["~> 1.1"])
+  s.add_dependency("kramdown", ["~> 1.2"])
 end

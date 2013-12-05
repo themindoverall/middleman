@@ -1,19 +1,8 @@
-# Required to hack around Padrino blocks within different template types.
-require 'rbconfig'
-if RUBY_VERSION =~ /1.8/ && RbConfig::CONFIG['ruby_install_name'] == 'ruby'
-  begin
-    require 'ruby18_source_location'
-  rescue LoadError
-    $stderr.puts "Ruby 1.8 requires the 'ruby18_source_location' gem be added to your Gemfile"
-    exit(1)
-  end
+if !defined?(::Padrino::Helpers)
+  require 'vendored-middleman-deps/padrino-core-0.11.4/lib/padrino-core/support_lite'
+  require 'vendored-middleman-deps/padrino-helpers-0.11.4/lib/padrino-helpers'
 end
 
-if !defined?(::Padrino::Helpers)
-  require 'vendored-middleman-deps/padrino-core-0.11.2/lib/padrino-core/support_lite'
-  require 'vendored-middleman-deps/padrino-helpers-0.11.2/lib/padrino-helpers'
-end
-    
 class Padrino::Helpers::OutputHelpers::ErbHandler
   # Force Erb capture not to use safebuffer
   def capture_from_template(*args, &block)
@@ -132,7 +121,7 @@ class Middleman::CoreExtensions::DefaultHelpers < ::Middleman::Extension
     # Generate body css classes based on the current path
     #
     # @return [String]
-    def page_classes
+    def page_classes(options={})
       path = current_path.dup
       path << index_file if path.end_with?('/')
       path = ::Middleman::Util.strip_leading_slash(path)
@@ -141,7 +130,15 @@ class Middleman::CoreExtensions::DefaultHelpers < ::Middleman::Extension
       parts = path.split('.').first.split('/')
       parts.each_with_index { |path, i| classes << parts.first(i+1).join('_') }
 
-      classes.join(' ')
+      prefix = options[:numeric_prefix] || "x"
+      classes.map do |c|
+        # Replace weird class name characters
+        c = c.gsub(/[^a-zA-Z0-9\-_]/, '-')
+
+        # Class names can't start with a digit
+        c = "#{prefix}#{c}" if c =~ /\A\d/
+        c
+      end.join(' ')
     end
 
     # Get the path of a file of a given type
@@ -176,11 +173,15 @@ class Middleman::CoreExtensions::DefaultHelpers < ::Middleman::Extension
       if path.include?('//') or path.start_with?('data:')
         path
       else # rewrite paths to use their destination path
-        path = File.join(prefix, path)
-        if resource = sitemap.find_resource_by_path(path)
+        if resource = sitemap.find_resource_by_destination_path(url_for(path))
           resource.url
         else
-          File.join(config[:http_prefix], path)
+          path = File.join(prefix, path)
+          if resource = sitemap.find_resource_by_path(path)
+            resource.url
+          else
+            File.join(config[:http_prefix], path)
+          end
         end
       end
     end

@@ -38,8 +38,7 @@ module Middleman
 
           # Setup a redirect from a path to a target
           # @param [String] path
-          # @param [Hash] The :to value gives a target path
-          # @return [void]
+          # @param [Hash] opts The :to value gives a target path
           def create_redirect(path, opts={}, &block)
             if block_given?
               opts[:template] = block
@@ -77,7 +76,7 @@ module Middleman
           def template?
             true
           end
-      
+
           def render(*args, &block)
             url = ::Middleman::Util.url_for(store.app, @request_path, :relative => false, :find_resource => true)
 
@@ -89,6 +88,7 @@ module Middleman
                   <head>
                     <meta http-equiv=refresh content="0; url=#{url}" />
                     <meta name="robots" content="noindex,follow" />
+                    <meta http-equiv="cache-control" content="no-cache" />
                   </head>
                   <body>
                   </body>
